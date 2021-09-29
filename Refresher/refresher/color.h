@@ -4,12 +4,14 @@
 #include "vec3.h"
 #include<iostream>
 
-void write_color(std::ostream& out, const color pixel, int samples_per_pixel) {
-	auto r = pixel.x();
-	auto g = pixel.y();
-	auto b = pixel.z();
+void write_color(std::ostream& out, const color pixel_color, int samples_per_pixel) {
+	auto r = pixel_color.x();
+	auto g = pixel_color.y();
+	auto b = pixel_color.z();
 
 	auto scale = 1.0 / samples_per_pixel;
+
+	// Perform gamma correction
 	r = sqrt(r * scale);
 	g = sqrt(g * scale);
 	b = sqrt(b * scale);

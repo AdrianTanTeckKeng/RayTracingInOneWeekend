@@ -14,15 +14,30 @@ color ray_color(const ray& r, const hittable& world, int depth) {
     if (depth <= 0)
         return color(0, 0, 0);
 
+    /*
     if (world.hit(r, 0.001, infinity, rec)) {
         ray scattered;
         color attenuation;
         if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
+
+            // Why this formula for scattering?
             return attenuation * ray_color(scattered, world, depth - 1);
-        return color(0, 0, 0);
     }
 
-    vec3 unit_direction = unit_vector(r.direction());
+    */
+
+    if (world.hit(r, 0.001, infinity, rec)) {
+        ray scattered;
+        color attenuation;
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
+            return attenuation * ray_color(scattered, world, depth - 1);
+        }
+    }
+
+    
+
+    // why?
+    vec3 unit_direction = -unit_vector(r.direction());
     auto t = 0.5 * (unit_direction.y() + 1.0);
     return (1.0 - t) * color(1.0, 1.0, 1.0) + t * color(0.5, 0.7, 1.0);
 }
@@ -38,21 +53,22 @@ int main() {
     const int max_depth = 50;
 
     // World
+    
     hittable_list world;
 
     auto material_ground = std::make_shared<lambertian>(color(0.8, 0.8, 0.0));
-    auto material_center = std::make_shared<lambertian>(color(0.7, 0.3, 0.3));
-    auto material_left = std::make_shared<metal>(color(0.8, 0.8, 0.8));
-    auto material_right = std::make_shared<metal>(color(0.8, 0.6, 0.2));
+    auto material_center = std::make_shared<lambertian>(color(0.1, 0.2, 0.5));
+    auto material_left = std::make_shared<metal>(color(0.8, 0.8, 0.8), 0.3);
+    auto material_right = std::make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
 
     world.add(std::make_shared<sphere>(point3(0.0, -100.5, -1.0), 100.0, material_ground));
     world.add(std::make_shared<sphere>(point3(0.0, 0.0, -1.0), 0.5, material_center));
     world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(std::make_shared<sphere>(point3(-1.0, 0.0, -1.0), -0.45, material_left));
     world.add(std::make_shared<sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
 
-    // Camera
+    camera cam(point3(-2, 2, 1), point3(0, 0, -1), vec3(0, 1, 0), 20, aspect_ratio);
 
-    camera cam;
 
     // Render
 

@@ -12,25 +12,25 @@ public:
 	hittable_list() {}
 	hittable_list(std::shared_ptr<hittable> object) { add(object); }
 
-	void add(std::shared_ptr<hittable> object) { objects.push_back(object); }
 	void clear() { objects.clear(); }
+	void add(std::shared_ptr<hittable> object) { objects.push_back(object); }
 
-	virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
+	bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const override;
 };
 
 bool hittable_list::hit(const ray& r, double t_min, double t_max, hit_record& rec) const {
 	hit_record temp_rec;
+	double closest_so_far = t_max;
 	bool hit_anything = false;
-	auto closest_so_far = t_max;
-
+	
 	for (const auto& object : objects) {
-		if (object->hit(r, t_min, closest_so_far , temp_rec)) {
-			hit_anything = true;
+		if (object->hit(r, t_min, closest_so_far, temp_rec)) {
 			rec = temp_rec;
 			closest_so_far = rec.t;
+			hit_anything = true;
+
 		}
 	}
-
 	return hit_anything;
 }
 #endif
